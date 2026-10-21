@@ -1,0 +1,25 @@
+# Configuration pour SHDataPlaceholders
+
+# Valeur retournée par le placeholder si aucune donnée n'existe pour cette clé
+default-value: 0
+
+# placeholders
+# %shdataplaceholders_<clé>%
+
+# Commandes
+# /shdata <add|set|remove> <key> <amount> <player>
+
+# Sauvegarde automatique des joueurs en ligne (en secondes)
+# Mettre à -1 pour désactiver (sauvegarde uniquement à la déconnexion/arrêt)
+autosave-interval: 300
+
+messages:
+  prefix: "&7&l« &f&lSH &8&l» "
+  no-permission: "&fCommande inconnue, essayez autre chose."
+  player-not-found: "&cJoueur introuvable."
+  invalid-number: "&cCe n'est pas un nombre valide."
+  usage: "&cUsage: /shdata <add|take|set> <clé> <montant> <joueur>"
+  success-add: "&7Valeur de &e%key% &7pour &b%player% &7a été augmenté de &e%amount%&7. (Nouveau: %value%)"
+  success-take: "&7Valeur de &e%key% &7pour &b%player% &7a été réduit de &e%amount%&7. (Nouveau: %value%)"
+  success-set: "&7Valeur de &e%key% &7pour &b%player% &7a été défini à &e%amount%&7."
+  reload: "&aConfiguration rechargée."
