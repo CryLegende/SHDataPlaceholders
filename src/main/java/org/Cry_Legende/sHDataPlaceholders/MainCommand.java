@@ -27,6 +27,7 @@ public class MainCommand implements CommandExecutor {
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
             plugin.reloadConfig();
             plugin.getConfigManager().reload();
+            plugin.getDataManager().reload();
             sender.sendMessage(plugin.getConfigManager().getMessage("reload"));
             return true;
         }
