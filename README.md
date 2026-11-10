@@ -21,12 +21,26 @@ Utilisé sur : **Opale**.
 ## Dépendances
 
 - Obligatoires : `PlaceholderAPI`
+- Optionnelle : `SHNetwork` (mode réseau)
+
+## Mode réseau
+
+Avec **SHNetwork** installé (et `reseau.actif: true`, valeur par défaut), plusieurs serveurs de jeu partagent les valeurs des joueurs :
+
+- les valeurs sont dans MariaDB (table `shdataplaceholders_values` : `uuid`, `stat`, `value`) ; `add` et `take` sont faits par la base (`value = value + ?`, la ligne verrouillée le temps de l'opération) : deux serveurs qui modifient la même valeur au même moment s'additionnent, aucun ne repart d'une valeur lue plus tôt ; le résultat reste dans les bornes d'un entier ;
+- `/shdata` marche pour un joueur de ce serveur, d'un autre serveur ou hors ligne : le pseudo est retrouvé parmi les joueurs connectés au réseau, dans la table des comptes (`reseau.table-comptes`, `Global.sh_track_firstseen`), sinon parmi les joueurs déjà venus sur ce serveur ; jamais de recherche Mojang ;
+- le serveur qui modifie une valeur prévient les autres par le bus (sujet `reseau.canal`) : celui où le joueur est connecté relit la clé en base ;
+- les placeholders lisent la mémoire, jamais la base ; à l'arrivée d'un joueur ses valeurs sont relues une fois le départ de l'autre serveur confirmé par SHNetwork (d'ici là, valeur par défaut) ;
+- au départ d'un joueur, SHNetwork attend que les écritures en cours soient finies ;
+- `userdata/<uuid>.json` n'est plus lu ni écrit : `/shdata import` les reprend une fois dans la base, sans écraser les valeurs déjà présentes.
+
+Sans SHNetwork, ou sans les clés `reseau` dans la configuration, le plugin se comporte comme avant : fichiers locaux. Si la base est injoignable, les commandes répondent par une erreur et les placeholders gardent la valeur par défaut. La table se crée toute seule au démarrage, ou à la main avec `sql/schema.sql`.
 
 ## Commandes
 
 | Commande | Alias | Description | Permission |
 |---|---|---|---|
-| `/shdataplaceholders` | `/shdata`, `/statsdata` | Commande principale pour gérer les stats | `shdata.admin` |
+| `/shdataplaceholders` | `/shdata`, `/statsdata` | Commande principale pour gérer les stats (`add`, `take`, `set`, `reload`, `import`) | `shdata.admin` |
 
 ## Permissions
 
@@ -40,7 +54,8 @@ Fichiers par défaut repris du serveur (secrets remplacés par `CHANGE_ME`). Cli
 
 <pre>
 plugins/SHDataPlaceholders/
-└── <a href="src/main/resources/config.yml">config.yml</a>
+├── <a href="src/main/resources/config.yml">config.yml</a>
+└── <a href="src/main/resources/messages.yml">messages.yml</a>
 </pre>
 
 ## Compilation

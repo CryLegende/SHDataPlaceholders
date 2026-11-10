@@ -1,0 +1,6 @@
+# Messages du mode réseau de SHDataPlaceholders (ceux de /shdata sont dans config.yml).
+# Variables : %joueurs%, %ajoutees% et %deja% (import), %erreur%.
+reseau-inactif: "&7&l« &e&lSH &8&l» &7Le mode réseau n'est &epas actif &7sur ce serveur."
+reseau-import: "&7&l« &a&lSH &8&l» &7Import terminé : &a%ajoutees% &7valeur(s) ajoutée(s) à la base pour &e%joueurs% &7joueur(s), &e%deja% &7déjà présente(s)."
+reseau-import-erreur: "&7&l« &c&lSH &8&l» &7Import impossible : &c%erreur%&7."
+reseau-erreur: "&7&l« &c&lSH &8&l» &7Base partagée injoignable : &c%erreur%&7."

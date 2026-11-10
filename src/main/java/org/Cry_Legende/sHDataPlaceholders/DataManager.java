@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
+import org.Cry_Legende.sHDataPlaceholders.network.NetworkData;
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -42,6 +44,8 @@ public class DataManager {
     // Joueurs en cache dont le dernier enregistrement a échoué (modifyStat écrit déjà chaque modification)
     private final Set<UUID> dirty = ConcurrentHashMap.newKeySet();
     private volatile int defaultValue;
+    // Non nul seulement avec SHNetwork : les valeurs vivent alors dans la base partagée, le cache ne sert qu'aux lectures
+    private volatile NetworkData network;
 
     public DataManager(SHDataPlaceholders plugin) {
         this.plugin = plugin;
@@ -49,6 +53,25 @@ public class DataManager {
         if (!dataFolder.exists()) dataFolder.mkdirs();
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         reload();
+    }
+
+    /** Passe en mode réseau : valeurs en base partagée au lieu des fichiers userdata. */
+    public void enableNetwork(NetworkData network) {
+        this.network = network;
+    }
+
+    /** Mode réseau actif, ou null sur un serveur seul. */
+    public NetworkData getNetwork() {
+        return network;
+    }
+
+    /** Cache des valeurs des joueurs connectés (UUID -> clé -> valeur). */
+    public Map<UUID, Map<String, Integer>> getCache() {
+        return cache;
+    }
+
+    public int getDefaultValue() {
+        return defaultValue;
     }
 
     /** Relit la valeur par défaut en config (appelé au chargement et au /shdata reload). */
@@ -67,6 +90,10 @@ public class DataManager {
     }
 
     public void loadPlayer(UUID uuid) {
+        if (network != null) {
+            network.beginLoad(uuid);
+            return;
+        }
         online.add(uuid);
         io.execute(() -> {
             if (!online.contains(uuid)) return; // reparti avant que la lecture ne passe
@@ -76,6 +103,10 @@ public class DataManager {
     }
 
     public void unloadPlayer(UUID uuid) {
+        if (network != null) {
+            network.unload(uuid);
+            return;
+        }
         online.remove(uuid);
         io.execute(() -> {
             Map<String, Integer> data = cache.remove(uuid);
@@ -87,11 +118,16 @@ public class DataManager {
 
     /** Réenregistre les joueurs dont l'écriture a échoué (les autres sont déjà à jour sur le disque). */
     public void saveAll() {
+        if (network != null) return; // les valeurs sont écrites en base à chaque modification
         io.execute(this::saveDirty);
     }
 
     /** Arrêt du plugin : termine les opérations en cours puis réenregistre ce qui reste à écrire. */
     public void saveAllSync() {
+        if (network != null) {
+            network.stop();
+            return;
+        }
         io.shutdown();
         try {
             if (!io.awaitTermination(10, TimeUnit.SECONDS)) {
@@ -114,6 +150,10 @@ public class DataManager {
 
     public CompletableFuture<Integer> modifyStat(UUID uuid, String key, int amount, Operation op) {
         String safeKey = key.toLowerCase(); // Conversion auto en minuscule
+
+        if (network != null) {
+            return network.modify(uuid, safeKey, amount, op);
+        }
 
         return CompletableFuture.supplyAsync(() -> {
             // En ligne : on prend l'objet DIRECTEMENT dans la mémoire (PAPI le voit tout de suite),

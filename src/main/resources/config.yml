@@ -1,3 +1,21 @@
+# ======================================================================== #
+# SHDataPlaceholders
+#
+# Plugin : valeurs numériques par joueur (add, take, set) exposées en placeholders PlaceholderAPI. Une valeur
+# jamais modifiée vaut 'default-value'. Avec SHNetwork, les valeurs sont partagées entre les serveurs (voir la
+# section 'reseau' en bas du fichier).
+#
+# Placeholder : %shdataplaceholders_<clé>% (clé en minuscules).
+#
+# Commandes (permission shdata.admin, par défaut : op) :
+#   /shdata <add|take|set> <clé> <montant> <joueur>   Modifie la valeur d'un joueur (alias : /shdataplaceholders, /statsdata).
+#   /shdata reload                                    Recharge la configuration. Les clés de 'reseau' demandent un redémarrage.
+#   /shdata import                                    Mode réseau : reprend les fichiers userdata dans la base partagée (une seule fois).
+#
+# Les messages du mode réseau sont dans 'messages.yml'.
+#
+# ======================================================================== #
+
 # Configuration pour SHDataPlaceholders
 
 # Valeur retournée par le placeholder si aucune donnée n'existe pour cette clé
@@ -23,3 +41,27 @@ messages:
   success-take: "&7Valeur de &e%key% &7pour &b%player% &7a été réduit de &e%amount%&7. (Nouveau: %value%)"
   success-set: "&7Valeur de &e%key% &7pour &b%player% &7a été défini à &e%amount%&7."
   reload: "&aConfiguration rechargée."
+
+# Mode réseau. Actif seulement si SHNetwork est installé et 'actif' vaut true : les valeurs sont alors dans la base
+# partagée (table shdataplaceholders_values : uuid, stat, value). Chaque add, take ou set est fait par la base,
+# pour un joueur de ce serveur, d'un autre serveur ou hors ligne ; les valeurs d'un joueur sont relues à son
+# arrivée sur un serveur, et les placeholders lisent la mémoire. Sans SHNetwork, rien de ceci n'est utilisé et les
+# valeurs restent dans userdata/<uuid>.json. Demande un redémarrage.
+reseau:
+  actif: true
+  # Durée maximale, en secondes, pendant laquelle on attend que l'autre serveur ait fini de sauvegarder
+  # le joueur avant de relire ses valeurs
+  attente-max-secondes: 10
+  # Sujet du bus sur lequel un serveur prévient les autres qu'une valeur a changé
+  canal: shdataplaceholders
+  # Table des comptes connus du réseau (colonnes name en minuscules et display_name), pour retrouver par son pseudo
+  # un joueur hors ligne qui n'est jamais venu sur ce serveur. Vide : seuls les joueurs connectés sur le réseau
+  # ou déjà venus sur ce serveur sont retrouvés.
+  table-comptes: "Global.sh_track_firstseen"
+  base-de-donnees:
+    url: "jdbc:mariadb://127.0.0.1:3306/bo_net"
+    utilisateur: shdataplaceholders
+    mot-de-passe: CHANGE_ME
+    # Délai maximal de connexion et de réponse de la base, en millisecondes. Une base qui ne répond pas laisse
+    # les placeholders sur la valeur par défaut et fait refuser les commandes avec un message d'erreur.
+    delai-ms: 3000

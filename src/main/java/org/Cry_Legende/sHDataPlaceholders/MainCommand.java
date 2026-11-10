@@ -1,5 +1,6 @@
 package org.Cry_Legende.sHDataPlaceholders;
 
+import org.Cry_Legende.sHDataPlaceholders.network.NetworkData;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -7,6 +8,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.util.Optional;
 import java.util.UUID;
 
 public class MainCommand implements CommandExecutor {
@@ -32,6 +35,11 @@ public class MainCommand implements CommandExecutor {
             return true;
         }
 
+        if (args.length > 0 && args[0].equalsIgnoreCase("import")) {
+            importData(sender);
+            return true;
+        }
+
         if (args.length < 4) {
             sender.sendMessage(plugin.getConfigManager().getMessage("usage"));
             return true;
@@ -52,15 +60,30 @@ public class MainCommand implements CommandExecutor {
 
         // Exécution async pour ne pas freeze le serveur en cherchant l'UUID
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            @SuppressWarnings("deprecation")
-            OfflinePlayer target = Bukkit.getOfflinePlayer(targetName);
+            NetworkData network = plugin.getDataManager().getNetwork();
+            UUID uuid;
+            String displayName;
+            if (network != null) {
+                // Avec SHNetwork : joueur de ce serveur, d'un autre serveur ou hors ligne, retrouvé sans recherche Mojang
+                Optional<NetworkData.Resolved> resolved = network.resolve(targetName);
+                if (resolved.isEmpty()) {
+                    sender.sendMessage(plugin.getConfigManager().getMessage("player-not-found"));
+                    return;
+                }
+                uuid = resolved.get().uuid();
+                displayName = resolved.get().name();
+            } else {
+                @SuppressWarnings("deprecation")
+                OfflinePlayer target = Bukkit.getOfflinePlayer(targetName);
 
-            if (target == null || (!target.hasPlayedBefore() && !target.isOnline())) {
-                sender.sendMessage(plugin.getConfigManager().getMessage("player-not-found"));
-                return;
+                if (target == null || (!target.hasPlayedBefore() && !target.isOnline())) {
+                    sender.sendMessage(plugin.getConfigManager().getMessage("player-not-found"));
+                    return;
+                }
+
+                uuid = target.getUniqueId();
+                displayName = target.getName() != null ? target.getName() : targetName;
             }
-
-            UUID uuid = target.getUniqueId();
             DataManager.Operation op;
 
             if (action.equals("add")) op = DataManager.Operation.ADD;
@@ -86,13 +109,37 @@ public class MainCommand implements CommandExecutor {
                 }
                 String msg = plugin.getConfigManager().getMessage(msgKey)
                     .replace("%key%", key)
-                    .replace("%player%", target.getName() != null ? target.getName() : targetName)
+                    .replace("%player%", displayName)
                     .replace("%amount%", String.valueOf(amount))
                     .replace("%value%", String.valueOf(newValue));
                 sender.sendMessage(msg);
+            }).exceptionally(error -> {
+                if (network != null) {
+                    sender.sendMessage(plugin.getNetworkMessage("reseau-erreur").replace("%erreur%", String.valueOf(error.getMessage())));
+                }
+                return null;
             });
         });
 
         return true;
+    }
+
+    /** /shdata import : reprend les fichiers userdata dans la base partagée (une fois, sans écraser ce qui y est déjà). */
+    private void importData(CommandSender sender) {
+        NetworkData network = plugin.getDataManager().getNetwork();
+        if (network == null) {
+            sender.sendMessage(plugin.getNetworkMessage("reseau-inactif"));
+            return;
+        }
+        network.importFolder(new File(plugin.getDataFolder(), "userdata"), (counts, error) -> {
+            if (error != null) {
+                sender.sendMessage(plugin.getNetworkMessage("reseau-import-erreur").replace("%erreur%", error));
+            } else {
+                sender.sendMessage(plugin.getNetworkMessage("reseau-import")
+                    .replace("%joueurs%", String.valueOf(counts[0]))
+                    .replace("%ajoutees%", String.valueOf(counts[1]))
+                    .replace("%deja%", String.valueOf(counts[2])));
+            }
+        });
     }
 }
