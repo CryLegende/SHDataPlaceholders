@@ -14,12 +14,36 @@ libraries:
 
 commands:
   shdataplaceholders:
-    description: Commande principale pour gérer les stats
+    description: Gérer les valeurs par joueur exposées en placeholders
     aliases: [shdata, statsdata]
-    usage: /shdata <add|set|remove> <key> <amount> <player> | import
-    permission: shdata.admin
+    usage: /shdataplaceholders <add|take|set|reload|import|info>
 
 permissions:
-  shdata.admin:
-    description: Permet de modifier les données
+  shdataplaceholders.admin:
+    description: Toute l'administration de SHDataPlaceholders
+    default: op
+    children:
+      shdataplaceholders.admin.add: true
+      shdataplaceholders.admin.take: true
+      shdataplaceholders.admin.set: true
+      shdataplaceholders.admin.reload: true
+      shdataplaceholders.admin.import: true
+      shdataplaceholders.admin.info: true
+  shdataplaceholders.admin.add:
+    description: Augmenter une valeur d'un joueur
+    default: op
+  shdataplaceholders.admin.take:
+    description: Réduire une valeur d'un joueur (aussi « remove »)
+    default: op
+  shdataplaceholders.admin.set:
+    description: Fixer une valeur d'un joueur
+    default: op
+  shdataplaceholders.admin.reload:
+    description: Recharger config.yml et messages.yml
+    default: op
+  shdataplaceholders.admin.import:
+    description: Reprendre les fichiers userdata dans la base partagée (mode réseau)
+    default: op
+  shdataplaceholders.admin.info:
+    description: Consulter les valeurs d'un joueur
     default: op

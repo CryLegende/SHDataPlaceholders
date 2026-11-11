@@ -167,6 +167,23 @@ public final class NetworkData {
         return future;
     }
 
+    /** Toutes les valeurs d'un joueur lues en base (lecture seule, joueur de ce serveur, d'un autre ou hors ligne). */
+    public CompletableFuture<Map<String, Integer>> readAll(UUID uuid) {
+        CompletableFuture<Map<String, Integer>> future = new CompletableFuture<>();
+        try {
+            io.execute(() -> {
+                try {
+                    future.complete(new java.util.TreeMap<>(db.loadAll(uuid)));
+                } catch (SQLException e) {
+                    future.completeExceptionally(e);
+                }
+            });
+        } catch (RejectedExecutionException stopped) {
+            future.completeExceptionally(stopped);
+        }
+        return future;
+    }
+
     /** Un autre serveur a modifié une valeur : si le joueur est ici, la clé est relue en base. Fil du bus : ne bloque pas. */
     private void onRemoteChange(String json) {
         try {

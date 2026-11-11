@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -146,6 +147,17 @@ public class DataManager {
                 dirty.remove(uuid);
             }
         }
+    }
+
+    /** Toutes les valeurs d'un joueur (lecture seule), triées par clé : en mémoire s'il est connecté ici, sinon lues. */
+    public CompletableFuture<Map<String, Integer>> readStats(UUID uuid) {
+        if (network != null) {
+            return network.readAll(uuid);
+        }
+        return CompletableFuture.supplyAsync(() -> {
+            Map<String, Integer> data = cache.get(uuid);
+            return new TreeMap<>(data != null ? data : loadDataFromFile(uuid));
+        }, io);
     }
 
     public CompletableFuture<Integer> modifyStat(UUID uuid, String key, int amount, Operation op) {

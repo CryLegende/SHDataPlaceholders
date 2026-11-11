@@ -7,40 +7,36 @@
 #
 # Placeholder : %shdataplaceholders_<clé>% (clé en minuscules).
 #
-# Commandes (permission shdata.admin, par défaut : op) :
-#   /shdata <add|take|set> <clé> <montant> <joueur>   Modifie la valeur d'un joueur (alias : /shdataplaceholders, /statsdata).
-#   /shdata reload                                    Recharge la configuration. Les clés de 'reseau' demandent un redémarrage.
-#   /shdata import                                    Mode réseau : reprend les fichiers userdata dans la base partagée (une seule fois).
+# Commande (alias : /shdata, /statsdata) :
+#   /shdataplaceholders add <clé> <montant> <joueur>    Augmente la valeur d'un joueur.
+#   /shdataplaceholders take <clé> <montant> <joueur>   Réduit la valeur d'un joueur (ancien nom : remove).
+#   /shdataplaceholders set <clé> <montant> <joueur>    Fixe la valeur d'un joueur.
+#   /shdataplaceholders info <joueur> [clé]             Affiche une valeur ou toutes les valeurs d'un joueur.
+#   /shdataplaceholders reload                          Relit ce fichier et messages.yml, relance la sauvegarde
+#                                                       automatique. Un fichier illisible ne change rien. Les clés de
+#                                                       'reseau' demandent un redémarrage.
+#   /shdataplaceholders import                          Mode réseau : reprend les fichiers userdata dans la base
+#                                                       partagée (une seule fois).
 #
-# Les messages du mode réseau sont dans 'messages.yml'.
+# Permissions (par défaut : op) :
+#   shdataplaceholders.admin          Toutes les sous-commandes.
+#   shdataplaceholders.admin.add      /shdataplaceholders add
+#   shdataplaceholders.admin.take     /shdataplaceholders take (et remove)
+#   shdataplaceholders.admin.set      /shdataplaceholders set
+#   shdataplaceholders.admin.info     /shdataplaceholders info
+#   shdataplaceholders.admin.reload   /shdataplaceholders reload
+#   shdataplaceholders.admin.import   /shdataplaceholders import
+#
+# Les textes sont dans messages.yml.
 #
 # ======================================================================== #
-
-# Configuration pour SHDataPlaceholders
 
 # Valeur retournée par le placeholder si aucune donnée n'existe pour cette clé
 default-value: 0
 
-# placeholders
-# %shdataplaceholders_<clé>%
-
-# Commandes
-# /shdata <add|set|remove> <key> <amount> <player>
-
 # Sauvegarde automatique des joueurs en ligne (en secondes)
 # Mettre à -1 pour désactiver (sauvegarde uniquement à la déconnexion/arrêt)
 autosave-interval: 300
-
-messages:
-  prefix: "&7&l« &f&lSH &8&l» "
-  no-permission: "&fCommande inconnue, essayez autre chose."
-  player-not-found: "&cJoueur introuvable."
-  invalid-number: "&cCe n'est pas un nombre valide."
-  usage: "&cUsage: /shdata <add|take|set> <clé> <montant> <joueur>"
-  success-add: "&7Valeur de &e%key% &7pour &b%player% &7a été augmenté de &e%amount%&7. (Nouveau: %value%)"
-  success-take: "&7Valeur de &e%key% &7pour &b%player% &7a été réduit de &e%amount%&7. (Nouveau: %value%)"
-  success-set: "&7Valeur de &e%key% &7pour &b%player% &7a été défini à &e%amount%&7."
-  reload: "&aConfiguration rechargée."
 
 # Mode réseau. Actif seulement si SHNetwork est installé et 'actif' vaut true : les valeurs sont alors dans la base
 # partagée (table shdataplaceholders_values : uuid, stat, value). Chaque add, take ou set est fait par la base,

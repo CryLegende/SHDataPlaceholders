@@ -1,5 +1,31 @@
-# Messages du mode réseau de SHDataPlaceholders (ceux de /shdata sont dans config.yml).
-# Variables : %joueurs%, %ajoutees% et %deja% (import), %erreur%.
+# Messages de SHDataPlaceholders. Couleurs avec &. Un message vide ("") n'est pas envoyé.
+#
+# Variables :
+#   %subcommands%  sous-commandes que l'expéditeur peut utiliser, séparées par |
+#   %key% %player% %amount% %value% %count%   clé, joueur, montant, nouvelle valeur, nombre de valeurs
+#   %file% %error%                            fichier illisible et première ligne de son erreur
+#   %joueurs% %ajoutees% %deja%               import (mode réseau)
+#   %erreur%                                  erreur de la base (mode réseau)
+
+no-permission: "&7&l« &f&lSH &8&l» &fCommande inconnue, essayez autre chose."
+usage: "&7&l« &6&lSH &8&l» &7Utilisation : &6/shdataplaceholders <%subcommands%>"
+usage-modify: "&7&l« &6&lSH &8&l» &cUsage: /shdataplaceholders <add|take|set> <clé> <montant> <joueur>"
+usage-info: "&7&l« &6&lSH &8&l» &7Utilisation : &6/shdataplaceholders info <joueur> [clé]"
+player-not-found: "&7&l« &f&lSH &8&l» &cJoueur introuvable."
+invalid-number: "&7&l« &f&lSH &8&l» &cCe n'est pas un nombre valide."
+success-add: "&7&l« &f&lSH &8&l» &7Valeur de &e%key% &7pour &b%player% &7a été augmenté de &e%amount%&7. (Nouveau: %value%)"
+success-take: "&7&l« &f&lSH &8&l» &7Valeur de &e%key% &7pour &b%player% &7a été réduit de &e%amount%&7. (Nouveau: %value%)"
+success-set: "&7&l« &f&lSH &8&l» &7Valeur de &e%key% &7pour &b%player% &7a été défini à &e%amount%&7."
+reload-ok: "&7&l« &f&lSH &8&l» &aConfiguration rechargée."
+reload-network: "&8• &7Les clés de &6reseau &7demandent un redémarrage."
+reload-error: "&7&l« &c&lSH &8&l» &7Rechargement annulé, &crien n'a été changé&7. Fichier &c%file%&7 : &c%error%"
+info-value: "&7&l« &6&lSH &8&l» &b%player% &7: &e%key% &7= &f%value%"
+info-default: "&7&l« &6&lSH &8&l» &e%key% &7n'a jamais été modifiée pour &b%player% &7(valeur par défaut : &f%value%&7)."
+info-header: "&7&l« &6&lSH &8&l» &b%player% &7: &6%count% &7valeur(s) :"
+info-entry: "&8• &e%key% &7= &f%value%"
+info-empty: "&7&l« &6&lSH &8&l» &b%player% &7n'a aucune valeur enregistrée."
+
+# Mode réseau (SHNetwork)
 reseau-inactif: "&7&l« &e&lSH &8&l» &7Le mode réseau n'est &epas actif &7sur ce serveur."
 reseau-import: "&7&l« &a&lSH &8&l» &7Import terminé : &a%ajoutees% &7valeur(s) ajoutée(s) à la base pour &e%joueurs% &7joueur(s), &e%deja% &7déjà présente(s)."
 reseau-import-erreur: "&7&l« &c&lSH &8&l» &7Import impossible : &c%erreur%&7."
