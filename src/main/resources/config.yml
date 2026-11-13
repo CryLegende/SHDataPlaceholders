@@ -53,9 +53,9 @@ reseau:
   # Table des comptes connus du réseau (colonnes name en minuscules et display_name), pour retrouver par son pseudo
   # un joueur hors ligne qui n'est jamais venu sur ce serveur. Vide : seuls les joueurs connectés sur le réseau
   # ou déjà venus sur ce serveur sont retrouvés.
-  table-comptes: "Global.sh_track_firstseen"
+  table-comptes: "minecraft.comptes"
   base-de-donnees:
-    url: "jdbc:mariadb://127.0.0.1:3306/bo_net"
+    url: "jdbc:mariadb://127.0.0.1:3306/minecraft"
     utilisateur: shdataplaceholders
     mot-de-passe: CHANGE_ME
     # Délai maximal de connexion et de réponse de la base, en millisecondes. Une base qui ne répond pas laisse
