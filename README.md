@@ -67,7 +67,7 @@ Les textes sont dans `messages.yml`. Au premier démarrage avec cette version, i
 
 ## Configuration
 
-Fichiers par défaut repris du serveur (secrets remplacés par `CHANGE_ME`). Cliquez sur un fichier pour l'ouvrir :
+Fichiers par défaut, avec des valeurs d'exemple. Cliquez sur un fichier pour l'ouvrir :
 
 <pre>
 plugins/SHDataPlaceholders/
